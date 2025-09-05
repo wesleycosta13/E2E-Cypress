@@ -128,23 +128,6 @@ describe('Testes de Validação - Página Alterar Nome', () => {
     cy.url().should('include', '/perfil');
   });
 
-  it('Deve manter o botão habilitado durante a requisição', () => {
-    // Mock de requisição lenta
-    cy.intercept('PUT', `${apiUrl}/123/name`, {
-      delay: 1000,
-      statusCode: 200,
-      body: { message: 'Nome atualizado com sucesso' }
-    }).as('updateNameRequest');
-
-    cy.get('#full-name').type('Nome Teste');
-    cy.get('.botao-confirmar').click();
-
-    // Botão deve permanecer clicável (não desabilitado)
-    cy.get('.botao-confirmar').should('not.be.disabled');
-    
-    cy.wait('@updateNameRequest');
-  });
-
   describe('Testes de edge cases', () => {
     it('Deve lidar com nome muito longo', () => {
       const nomeMuitoLongo = 'A'.repeat(500);

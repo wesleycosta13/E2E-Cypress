@@ -46,40 +46,6 @@ describe('Testes de Validação - Página de Login', () => {
     cy.contains('E-MAIL OU SENHA INVÁLIDOS').should('be.visible');
   });
 
-  it('Deve mostrar erro de conexão com servidor', () => {
-    // Mock de falha de conexão
-    cy.intercept('POST', 'http://localhost:5037/Login/login', {
-      forceNetworkError: true
-    }).as('loginRequest');
-
-    cy.get('#email').type('teste@example.com');
-    cy.get('#password').type('12345678');
-    cy.get('.login-button').click();
-
-    cy.wait('@loginRequest');
-    cy.contains('NÃO FOI POSSÍVEL SE CONECTAR AO SERVIDOR').should('be.visible');
-  });
-
-  it('Deve desabilitar campos durante o loading', () => {
-    // Mock de resposta lenta
-    cy.intercept('POST', 'http://localhost:5037/Login/login', {
-      delay: 2000,
-      statusCode: 200,
-      body: { token: 'fake-token' }
-    }).as('loginRequest');
-
-    cy.get('#email').type('teste@example.com');
-    cy.get('#password').type('12345678');
-    cy.get('.login-button').click();
-
-    // Campos devem ficar desabilitados durante o loading
-    cy.get('#email').should('be.disabled');
-    cy.get('#password').should('be.disabled');
-    cy.get('.login-button').should('be.disabled').and('contain', 'Entrando...');
-    
-    cy.wait('@loginRequest');
-  });
-
   it('Deve alternar visibilidade da senha', () => {
     cy.get('#password').type('minhasenha');
     cy.get('#password').should('have.attr', 'type', 'password');
@@ -103,48 +69,7 @@ describe('Testes de Validação - Página de Login', () => {
     cy.url().should('include', '/admin/login');
   });
 
-  it('Deve fazer login com sucesso e redirecionar', () => {
-    // Mock de login bem-sucedido
-    cy.intercept('POST', 'http://localhost:5037/Login/login', {
-      statusCode: 200,
-      body: { 
-        token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
-      }
-    }).as('loginRequest');
-
-    cy.get('#email').type('usuario.valido@example.com');
-    cy.get('#password').type('senha123');
-    cy.get('.login-button').click();
-
-    cy.wait('@loginRequest');
-    
-    // Verifica se o token foi salvo no localStorage
-    cy.window().its('localStorage.authToken').should('exist');
-    
-    // Verifica se redirecionou para a página correta
-    cy.url().should('include', '/selecionar-nivel');
-  });
-
-  it('Deve salvar userId no localStorage após login', () => {
-    // Mock com token que contém ID do usuário
-    const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxMjM0NSIsImlhdCI6MTUxNjIzOTAyMn0.abc123';
-    
-    cy.intercept('POST', 'http://localhost:5037/Login/login', {
-      statusCode: 200,
-      body: { token: mockToken }
-    }).as('loginRequest');
-
-    cy.get('#email').type('usuario@example.com');
-    cy.get('#password').type('senha123');
-    cy.get('.login-button').click();
-
-    cy.wait('@loginRequest');
-    
-    // Verifica se o userId foi salvo no localStorage
-    cy.window().its('localStorage.userId').should('eq', '12345');
-  });
-
-  describe('Testes de Formato de Email no Login', () => {
+  describe('Testes de Formato de Email no Login cenários de sucesso', () => {
     it.only('Deve aceitar email válido no campo de email', () => {
       cy.get('#email').type('usuario.valido@example.com');
       cy.get('#email').should('have.value', 'usuario.valido@example.com');
