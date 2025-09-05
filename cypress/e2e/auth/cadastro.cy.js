@@ -6,7 +6,7 @@ describe('Testes de Validação - Página de Cadastro', () => {
   });
 
   // Testa validação de campos obrigatórios vazios
-  it('Deve mostrar erro ao tentar cadastrar com campos vazios', () => {
+  it.only('Deve mostrar erro ao tentar cadastrar com campos vazios', () => {
     cy.get('.cadastro-button').click();
     cy.contains('Por favor, preencha todos os campos.').should('be.visible');
     
@@ -16,7 +16,7 @@ describe('Testes de Validação - Página de Cadastro', () => {
   });
 
   // Testa validação de tamanho mínimo da senha
-  it('Deve mostrar erro para senha com menos de 8 caracteres', () => {
+  it.only('Deve mostrar erro para senha com menos de 8 caracteres', () => {
     const senhasInvalidas = ['123', '1234', '12345', '123456', '1234567'];
 
     senhasInvalidas.forEach((senha) => {
@@ -35,7 +35,7 @@ describe('Testes de Validação - Página de Cadastro', () => {
   });
 
   // Testa validação de confirmação de senha
-  it('Deve mostrar erro quando senhas não coincidem', () => {
+  it.only('Deve mostrar erro quando senhas não coincidem', () => {
     cy.get('#name').type('Usuário Teste');
     cy.get('#email').type(`teste${Date.now()}@example.com`);
     cy.get('#password').type('12345678');
@@ -46,7 +46,7 @@ describe('Testes de Validação - Página de Cadastro', () => {
   });
 
   // Testa fluxo completo de cadastro bem-sucedido
-  it('Deve cadastrar com sucesso quando todos os campos são válidos', () => {
+  it.only('Deve cadastrar com sucesso quando todos os campos são válidos', () => {
     const uniqueEmail = `cypress_${Date.now()}@example.com`;
 
     cy.get('#name').type('Wesley Costa');
