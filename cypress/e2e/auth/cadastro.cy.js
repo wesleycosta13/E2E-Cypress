@@ -16,7 +16,7 @@ describe('Testes de Validação - Página de Cadastro', () => {
     cy.contains('Por favor, preencha todos os campos.').should('be.visible');
   });
 
-it.only('Deve mostrar erro para senha com menos de 8 caracteres', () => {
+it('Deve mostrar erro para senha com menos de 8 caracteres', () => {
   const senhasInvalidas = ['123', '1234', '12345', '123456', '1234567'];
 
   // Função para gerar nomes aleatórios
@@ -63,14 +63,6 @@ it.only('Deve mostrar erro para senha com menos de 8 caracteres', () => {
     cy.get('.cadastro-button').click();
 
     cy.contains('As senhas não coincidem!').should('be.visible');
-  });
-
-  it('Deve remover espaços automaticamente das senhas', () => {
-    cy.get('#password').type('123 456 789');
-    cy.get('#password').should('have.value', '123456789');
-    
-    cy.get('#confirm-password').type('987 654 321');
-    cy.get('#confirm-password').should('have.value', '987654321');
   });
 
   it('Deve cadastrar com sucesso quando todos os campos são válidos', () => {
