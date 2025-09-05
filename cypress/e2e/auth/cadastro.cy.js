@@ -5,66 +5,47 @@ describe('Testes de Validação - Página de Cadastro', () => {
     cy.visit(baseUrl);
   });
 
+  // Testa validação de campos obrigatórios vazios
   it('Deve mostrar erro ao tentar cadastrar com campos vazios', () => {
-    // Tenta cadastrar sem preencher nada
     cy.get('.cadastro-button').click();
     cy.contains('Por favor, preencha todos os campos.').should('be.visible');
-
-    // Preenche apenas alguns campos
+    
     cy.get('#name').type('Usuário Teste');
     cy.get('.cadastro-button').click();
     cy.contains('Por favor, preencha todos os campos.').should('be.visible');
   });
 
-it('Deve mostrar erro para senha com menos de 8 caracteres', () => {
-  const senhasInvalidas = ['123', '1234', '12345', '123456', '1234567'];
+  // Testa validação de tamanho mínimo da senha
+  it('Deve mostrar erro para senha com menos de 8 caracteres', () => {
+    const senhasInvalidas = ['123', '1234', '12345', '123456', '1234567'];
 
-  // Função para gerar nomes aleatórios
-  function gerarNomeAleatorio() {
-    const tamanho = 5 + Math.floor(Math.random() * 5); // nome com 5 a 9 letras
-    let nome = '';
-    for (let i = 0; i < tamanho; i++) {
-      const letra = String.fromCharCode(97 + Math.floor(Math.random() * 26)); // a-z
-      nome += letra;
-    }
-    return nome.charAt(0).toUpperCase() + nome.slice(1); // primeira letra maiúscula
-  }
+    senhasInvalidas.forEach((senha) => {
+      cy.visit(baseUrl);
+      const nome = `Usuario${Math.random().toString(36).substring(2, 8)}`;
+      const email = `teste${Date.now()}${Math.random().toString(36).substring(2, 6)}@example.com`;
+      
+      cy.get('#name').type(nome);
+      cy.get('#email').type(email);
+      cy.get('#password').type(senha);
+      cy.get('#confirm-password').type(senha);
+      cy.get('.cadastro-button').click();
 
-  // Função para gerar email aleatório
-  function gerarEmailAleatorio() {
-    const tamanho = 5 + Math.floor(Math.random() * 5); // parte do email com 5 a 9 letras
-    let email = '';
-    for (let i = 0; i < tamanho; i++) {
-      const letra = String.fromCharCode(97 + Math.floor(Math.random() * 26)); // a-z
-      email += letra;
-    }
-    const dominios = ['gmail.com', 'hotmail.com', 'yahoo.com', 'outlook.com'];
-    const dominio = dominios[Math.floor(Math.random() * dominios.length)];
-    return `${email}${Date.now()}@${dominio}`; // garante que seja único
-  }
-
-  senhasInvalidas.forEach((senha) => {
-    cy.visit(baseUrl); // Recarrega a página para cada teste
-    cy.get('#name').type(gerarNomeAleatorio());
-    cy.get('#email').type(gerarEmailAleatorio());
-    cy.get('#password').type(senha);
-    cy.get('#confirm-password').type(senha);
-    cy.get('.cadastro-button').click();
-
-    cy.contains('A senha deve ter no mínimo 8 caracteres.').should('be.visible');
+      cy.contains('A senha deve ter no mínimo 8 caracteres.').should('be.visible');
+    });
   });
-});
 
+  // Testa validação de confirmação de senha
   it('Deve mostrar erro quando senhas não coincidem', () => {
     cy.get('#name').type('Usuário Teste');
     cy.get('#email').type(`teste${Date.now()}@example.com`);
     cy.get('#password').type('12345678');
-    cy.get('#confirm-password').type('87654321'); // senha diferente
+    cy.get('#confirm-password').type('87654321');
     cy.get('.cadastro-button').click();
 
     cy.contains('As senhas não coincidem!').should('be.visible');
   });
 
+  // Testa fluxo completo de cadastro bem-sucedido
   it('Deve cadastrar com sucesso quando todos os campos são válidos', () => {
     const uniqueEmail = `cypress_${Date.now()}@example.com`;
 
@@ -75,32 +56,30 @@ it('Deve mostrar erro para senha com menos de 8 caracteres', () => {
     cy.get('.cadastro-button').click();
 
     cy.contains('Cadastro realizado com sucesso!').should('be.visible');
-    
-    // Verifica se redireciona para login após 2 segundos
     cy.wait(2500);
     cy.url().should('include', '/login');
   });
 
+  // Testa navegação de volta para a página de login
   it('Deve permitir navegar de volta para login', () => {
     cy.get('.back-button').click();
     cy.url().should('include', '/login');
   });
 
+  // Testa funcionalidade de mostrar/esconder senha
   it('Deve alternar a visibilidade da senha', () => {
     cy.get('#password').type('minhasenha');
     cy.get('#password').should('have.attr', 'type', 'password');
     
-    // Clica para mostrar senha
     cy.get('.password-toggle-icon').first().click();
     cy.get('#password').should('have.attr', 'type', 'text');
     
-    // Clica para esconder senha
     cy.get('.password-toggle-icon').first().click();
     cy.get('#password').should('have.attr', 'type', 'password');
   });
 });
 
-//Cenário de Sucesso
+// Testes de validação de formato de email
 describe('Testes de Formato de Email - Página de Cadastro', () => {
   const baseUrl = 'http://localhost:3000/cadastro';
 
@@ -108,6 +87,7 @@ describe('Testes de Formato de Email - Página de Cadastro', () => {
     cy.visit(baseUrl);
   });
 
+  // Testa aceitação de emails com formato válido
   it('Deve aceitar emails válidos', () => {
     const emailsValidos = [
       'usuario@example.com',
@@ -124,10 +104,10 @@ describe('Testes de Formato de Email - Página de Cadastro', () => {
       cy.get('#password').type('12345678');
       cy.get('#confirm-password').type('12345678');
       cy.get('.cadastro-button').click();
-
     });
   });
 
+  // Testa comportamento com emails de formato inválido
   it('Deve testar comportamento com emails potencialmente inválidos', () => {
     const emailsTeste = [
       'email-sem-arroba',
@@ -145,13 +125,8 @@ describe('Testes de Formato de Email - Página de Cadastro', () => {
       cy.get('#confirm-password').type('12345678');
       cy.get('.cadastro-button').click();
 
-      // A validação pode acontecer no frontend ou no backend
       cy.get('body').then(($body) => {
-        // Se houver erro de validação de email no frontend, será mostrado
-        // Se não, o backend vai rejeitar e mostrar erro genérico
         const hasAnyError = $body.find('.notification.error').length > 0;
-        
-        // Para emails muito inválidos, é provável que dê erro
         if (hasAnyError) {
           cy.get('.notification.error').should('be.visible');
         }
