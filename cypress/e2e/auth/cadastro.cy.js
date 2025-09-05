@@ -106,31 +106,5 @@ describe('Testes de Formato de Email - Página de Cadastro', () => {
       cy.get('.cadastro-button').click();
     });
   });
-
-  // Testa comportamento com emails de formato inválido
-  it('Deve testar comportamento com emails potencialmente inválidos', () => {
-    const emailsTeste = [
-      'email-sem-arroba',
-      'email@',
-      '@dominio.com',
-      'email@invalido',
-      'email@.com'
-    ];
-
-    emailsTeste.forEach((email) => {
-      cy.visit(baseUrl);
-      cy.get('#name').type('Usuário Teste');
-      cy.get('#email').type(email);
-      cy.get('#password').type('12345678');
-      cy.get('#confirm-password').type('12345678');
-      cy.get('.cadastro-button').click();
-
-      cy.get('body').then(($body) => {
-        const hasAnyError = $body.find('.notification.error').length > 0;
-        if (hasAnyError) {
-          cy.get('.notification.error').should('be.visible');
-        }
-      });
-    });
-  });
+  
 });

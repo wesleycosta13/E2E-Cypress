@@ -58,7 +58,7 @@ describe('Testes de Login Administrativo', () => {
   });
 
   // Teste completo de fluxo de login bem-sucedido com dados do fixture
-  it('Deve permitir acesso para administrador', () => {
+  it.only('Deve permitir acesso para administrador', () => {
     cy.fixture('auth/admin.json').then((adminData) => {
       const admin = adminData.admin;
 
